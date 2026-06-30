@@ -19,6 +19,10 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Секреты заданы как Environment secrets окружения github-pages,
+    # поэтому build-джоба тоже должна объявить это окружение, иначе их не увидит.
+    environment:
+      name: github-pages
     steps:
       - uses: actions/checkout@v4
 
