@@ -1,1 +1,0 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/components/board.tsx","./src/components/editor.tsx","./src/components/html.tsx","./src/components/questionmodal.tsx","./src/components/scoreboard.tsx","./src/components/setup.tsx","./src/lib/api.ts","./src/lib/sanitize.ts","./src/lib/sound.ts","./src/lib/supabase.ts","./src/lib/types.ts","./vite-env.d.ts"],"version":"5.9.3"}
