@@ -1,0 +1,787 @@
+/* ============================================================
+   «Своя игра» — дизайн-система
+   Атмосфера: ночная телестудия. Индиго-фиолет, тёплое золото
+   для баллов, электрические магента/циан как искры.
+   ============================================================ */
+
+:root {
+  /* Палитра */
+  --night: #0a0a23;
+  --night-2: #11102e;
+  --violet: #1e1b4b;
+  --violet-2: #2e1065;
+  --gold: #ffc83d;
+  --gold-deep: #ff9e2c;
+  --magenta: #ff2e97;
+  --cyan: #22d3ee;
+  --ink: #f8fafc;
+  --muted: #b7b4d6;
+  --muted-2: #6f6c97;
+  --line: rgba(255, 255, 255, 0.08);
+
+  /* Типографика */
+  --display: 'Unbounded', system-ui, sans-serif;
+  --body: 'Inter', system-ui, sans-serif;
+
+  /* Прочее */
+  --radius: 18px;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--body);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgba(124, 92, 255, 0.22), transparent 60%),
+    radial-gradient(1000px 650px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(255, 46, 151, 0.14), transparent 55%),
+    var(--night);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--magenta);
+  color: white;
+}
+
+/* ---------- Каркас приложения ---------- */
+
+.app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px clamp(16px, 4vw, 40px);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(10, 10, 35, 0.55);
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand .spark {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: var(--night);
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.brand .title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(16px, 2.4vw, 24px);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar .spacer {
+  flex: 1;
+}
+
+/* ---------- Кнопки ---------- */
+
+.btn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.12s var(--ease), background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+.btn.primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  border: none;
+  color: var(--night);
+}
+.btn.primary:hover {
+  filter: brightness(1.05);
+}
+.btn.ghost {
+  background: transparent;
+}
+.btn.danger {
+  border-color: rgba(255, 46, 151, 0.4);
+  color: #ffb3d4;
+}
+.btn.danger:hover {
+  background: rgba(255, 46, 151, 0.14);
+}
+.btn.sm {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 9px;
+}
+
+/* ---------- Игровое поле ---------- */
+
+.board-wrap {
+  flex: 1;
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.board {
+  display: grid;
+  gap: clamp(8px, 1vw, 14px);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.cat-head {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: clamp(13px, 1.4vw, 19px);
+  text-align: center;
+  padding: 16px 10px;
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, var(--violet-2), var(--violet));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+}
+
+.tile {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+  background: linear-gradient(165deg, rgba(46, 16, 101, 0.55), rgba(17, 16, 46, 0.85));
+  color: var(--gold);
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(22px, 3.4vw, 46px);
+  min-height: clamp(74px, 11vh, 128px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.16s var(--ease), box-shadow 0.2s, color 0.2s;
+  text-shadow: 0 2px 14px rgba(255, 200, 61, 0.25);
+}
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(255, 200, 61, 0.16), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tile:hover:not(.spent)::before {
+  opacity: 1;
+}
+.tile:hover:not(.spent) {
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 16px 40px rgba(124, 92, 255, 0.25), 0 0 0 1px rgba(255, 200, 61, 0.35) inset;
+}
+.tile:focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+.tile.spent {
+  color: var(--muted-2);
+  background: rgba(17, 16, 46, 0.5);
+  cursor: default;
+  text-shadow: none;
+}
+.tile.spent::after {
+  content: '✓';
+  position: absolute;
+  font-size: 18px;
+  color: var(--muted-2);
+  bottom: 8px;
+  right: 12px;
+  text-shadow: none;
+}
+
+/* ---------- Модал вопроса (проектор) ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 56px);
+  background: rgba(5, 5, 18, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.qcard {
+  width: min(1100px, 100%);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  background: linear-gradient(165deg, var(--violet), var(--night-2));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.qcard .qtop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px clamp(20px, 4vw, 40px);
+  border-bottom: 1px solid var(--line);
+}
+.qcard .qcat {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-size: 14px;
+}
+.qcard .qvalue {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(28px, 4vw, 52px);
+  color: var(--gold);
+}
+
+.qbody-scroll {
+  overflow: auto;
+  padding: clamp(24px, 5vw, 56px);
+  flex: 1;
+}
+
+/* Контент вопроса/ответа из dangerouslySetInnerHTML */
+.qhtml {
+  font-size: clamp(22px, 3vw, 38px);
+  line-height: 1.35;
+  font-weight: 500;
+  text-align: center;
+}
+.qhtml p {
+  margin: 0 0 0.6em;
+}
+.qhtml img,
+.qhtml video,
+.qhtml iframe {
+  max-width: 100%;
+  max-height: 52vh;
+  border-radius: 16px;
+  margin: 18px auto;
+  display: block;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+.qhtml audio {
+  width: min(560px, 100%);
+  margin: 18px auto 6px;
+  display: block;
+}
+.qhtml code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.78em;
+}
+.qhtml a {
+  color: var(--cyan);
+}
+
+.answer-block {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.16);
+  animation: rise 0.4s var(--ease);
+}
+.answer-label {
+  font-family: var(--display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 13px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  text-align: center;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.qfoot {
+  border-top: 1px solid var(--line);
+  padding: 18px clamp(20px, 4vw, 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: rgba(0, 0, 0, 0.2);
+}
+.qfoot .row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.qfoot .hint {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Кнопка начисления баллов команде */
+.award {
+  border: 1px solid var(--team, var(--magenta));
+  background: color-mix(in srgb, var(--team, var(--magenta)) 16%, transparent);
+  color: var(--ink);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.12s var(--ease), background 0.2s;
+}
+.award:hover {
+  background: color-mix(in srgb, var(--team, var(--magenta)) 30%, transparent);
+  transform: translateY(-2px);
+}
+.award .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--team, var(--magenta));
+}
+.award.minus {
+  filter: saturate(0.6);
+  opacity: 0.85;
+}
+
+/* ---------- Табло счёта ---------- */
+
+.scoreboard {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+/* Настройка шага начисления */
+.step-ctrl {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-width: 92px;
+  padding: 14px 14px;
+  border-radius: 18px;
+  border: 1px dashed var(--line);
+}
+.step-ctrl span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.step-ctrl .input {
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--display);
+  font-weight: 700;
+  text-align: center;
+}
+
+.score-card {
+  --team: var(--magenta);
+  position: relative;
+  min-width: 200px;
+  border-radius: 20px;
+  padding: 18px 20px;
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--team) 14%, transparent), transparent 70%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-top: 5px solid var(--team);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.score-card .team-name {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.score-card .team-score {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: 52px;
+  color: var(--ink);
+  line-height: 1.05;
+  text-shadow: 0 3px 18px color-mix(in srgb, var(--team) 45%, transparent);
+}
+.score-card .adj {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.adj button {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 9px 0;
+  font-weight: 800;
+  font-size: 15px;
+  font-family: var(--display);
+  transition: background 0.15s, transform 0.1s var(--ease);
+}
+.adj button:hover {
+  background: color-mix(in srgb, var(--team) 28%, transparent);
+}
+.adj button:active {
+  transform: translateY(1px);
+}
+
+/* Инструменты команды в редакторе: цвет + удалить */
+.team-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.color-swatch {
+  position: relative;
+  width: 38px;
+  height: 34px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.color-swatch input[type='color'] {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.team-tools .btn {
+  flex: 1;
+}
+
+/* ---------- Редактор ---------- */
+
+.editor {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.panel {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(16px, 2.5vw, 24px);
+}
+.panel h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+.section-title {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.field label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.input,
+.textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 15px;
+}
+.textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 120px;
+}
+.input:focus,
+.textarea:focus {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.cat-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cat-row .input {
+  flex: 1;
+}
+.q-chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.q-chip {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold);
+  font-family: var(--display);
+  font-weight: 700;
+  border-radius: 9px;
+  padding: 7px 12px;
+  font-size: 14px;
+}
+.q-chip:hover {
+  border-color: var(--gold);
+}
+.q-chip.empty {
+  color: var(--muted-2);
+  border-style: dashed;
+}
+
+.preview {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 18px;
+  min-height: 80px;
+}
+.preview .qhtml {
+  font-size: 18px;
+  text-align: left;
+}
+.preview .qhtml img,
+.preview .qhtml video,
+.preview .qhtml iframe {
+  max-height: 220px;
+  margin: 12px 0;
+}
+
+/* ---------- Утилиты ---------- */
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.muted {
+  color: var(--muted);
+}
+.center-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ---------- Экран настройки / загрузки ---------- */
+
+.setup {
+  max-width: 720px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(24px, 4vw, 44px);
+  box-shadow: var(--shadow);
+}
+.setup h1 {
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(26px, 4vw, 40px);
+  margin: 0 0 6px;
+}
+.setup .lead {
+  color: var(--muted);
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+.setup ol {
+  line-height: 1.7;
+  padding-left: 20px;
+}
+.setup code,
+.setup pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.setup pre {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  overflow: auto;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.kbd {
+  font-family: ui-monospace, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--gold);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 18, 50, 0.95);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 12px 18px;
+  border-radius: 12px;
+  z-index: 90;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+  animation: rise 0.25s var(--ease);
+}
+
+/* ---------- Адаптив ---------- */
+
+@media (max-width: 720px) {
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
